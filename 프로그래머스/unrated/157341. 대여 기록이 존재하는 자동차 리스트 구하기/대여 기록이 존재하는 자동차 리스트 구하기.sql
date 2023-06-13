@@ -1,0 +1,13 @@
+-- 코드를 입력하세요
+SELECT CAR_ID
+FROM CAR_RENTAL_COMPANY_CAR AS car
+WHERE 
+    CAR_TYPE = '세단' 
+    AND EXISTS (
+    SELECT 1
+    FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY AS history
+    WHERE 
+        history.CAR_ID = car.CAR_ID
+        AND START_DATE >= '2022-10-01'
+)
+ORDER BY CAR_ID DESC
