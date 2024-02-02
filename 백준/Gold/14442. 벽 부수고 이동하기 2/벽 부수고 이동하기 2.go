@@ -4,73 +4,94 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
+var (
+	dx = [4]int8{1, -1, 0, 0}
+	dy = [4]int8{0, 0, 1, -1}
+
+	n, m    int
+	k       uint8
+	matrix  [][]uint8
+	visited [][]uint8
+)
+
+type pos struct {
+	x   int
+	y   int
+	k   uint8
+	cnt int
+}
+
 func main() {
-	r := bufio.NewReader(os.Stdin)
-	w := bufio.NewWriter(os.Stdout)
-	defer w.Flush()
+	n, m, k, matrix = input()
 
-	var (
-		n, m, k int
-
-		dx = [4]int{1, 0, -1, 0}
-		dy = [4]int{0, 1, 0, -1}
-
-		grid  [][]byte
-		visit [][][]bool
-		q     [][4]int // y, x, breachCnt dist
-	)
-	fmt.Fscanf(r, "%d %d %d\n", &n, &m, &k)
-
-	grid = make([][]byte, n)
-	visit = make([][][]bool, k+1)
-	for i := range visit {
-		visit[i] = make([][]bool, n)
-		for j := range visit[i] {
-			visit[i][j] = make([]bool, m)
-		}
-	}
-	for i := range grid {
-		row := make([]byte, m)
-		fmt.Fscanln(r, &row)
-		grid[i] = row
+	visited = make([][]uint8, n)
+	for i := 0; i < n; i++ {
+		visited[i] = make([]uint8, m)
 	}
 
-	q = append(q, [4]int{0, 0, 0, 1})
+	result := move()
+	fmt.Println(result)
+}
 
-	for len(q) > 0 {
-		p := q[0]
-		if p[0] == n-1 && p[1] == m-1 {
-			fmt.Fprintln(w, p[3])
-			return
+func move() int {
+	queue := make(chan pos, n*m)
+	defer close(queue)
+
+	start := pos{0, 0, k, 1}
+	visited[start.y][start.x] = start.k + 1
+	queue <- start
+	for p := range queue {
+		if p.x == m-1 && p.y == n-1 {
+			return p.cnt
 		}
-		for i := range dx {
-			ny, nx := p[0]+dy[i], p[1]+dx[i]
-			if ny < 0 || nx < 0 || ny >= n || nx >= m {
+		for i := 0; i < 4; i++ {
+			nx := p.x + int(dx[i])
+			ny := p.y + int(dy[i])
+			if nx < 0 || nx >= m || ny < 0 || ny >= n {
 				continue
 			}
-			breachCnt, dist := p[2], p[3]+1
-			if grid[ny][nx] == '1' {
-				if breachCnt == k {
-					continue
+			if visited[ny][nx] >= p.k+1 {
+				continue
+			}
+			if matrix[ny][nx] == 1 {
+				if p.k > 0 {
+					visited[ny][nx] = p.k + 1
+					queue <- pos{nx, ny, p.k - 1, p.cnt + 1}
 				}
-				breachCnt++
+				continue
 			}
-
-			visited := false
-			for j := 0; j <= breachCnt; j++ {
-				if visit[j][ny][nx] {
-					visited = true
-					break
-				}
-			}
-			if !visited {
-				q = append(q, [4]int{ny, nx, breachCnt, dist})
-				visit[breachCnt][ny][nx] = true
-			}
+			visited[ny][nx] = p.k + 1
+			queue <- pos{nx, ny, p.k, p.cnt + 1}
 		}
-		q = q[1:]
+		if len(queue) == 0 {
+			return -1
+		}
 	}
-	fmt.Fprintln(w, -1)
+	return -1
+}
+
+func input() (int, int, uint8, [][]uint8) {
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	splitInput := strings.Split(scanner.Text(), " ")
+	n, _ := strconv.Atoi(splitInput[0])
+	m, _ := strconv.Atoi(splitInput[1])
+	k, _ := strconv.Atoi(splitInput[2])
+
+	matrix := make([][]uint8, n)
+	for i := 0; i < n; i++ {
+		if !scanner.Scan() {
+			break
+		}
+		matrix[i] = make([]uint8, m)
+		for index, ch := range scanner.Text() {
+			num, _ := strconv.ParseUint(string(ch), 10, 8)
+			matrix[i][index] = uint8(num)
+		}
+	}
+	return n, m, uint8(k), matrix
 }
