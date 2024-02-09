@@ -13,15 +13,15 @@ func main() {
 	var (
 		t, n int
 
-		nums [1e7 + 1]bool
+		nums [1e5 + 1]bool
 	)
 
 	nums[1] = true
-	for i := 2; i*i <= 1e7; i++ {
+	for i := 2; i*i <= 1e5; i++ {
 		if nums[i] {
 			continue
 		}
-		for j := i * i; j <= 1e7; j += i {
+		for j := i * i; j <= 1e5; j += i {
 			nums[j] = true
 		}
 	}
