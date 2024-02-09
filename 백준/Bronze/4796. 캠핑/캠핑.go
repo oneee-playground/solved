@@ -19,13 +19,10 @@ func main() {
 			break
 		}
 		use := 0
-		for v > 0 {
-			if v <= l {
-				use += v
-				break
-			}
-			use += l
-			v -= p
+		if v%p > l {
+			use = v/p*l + l
+		} else {
+			use = v/p*l + v%p
 		}
 		fmt.Fprintf(w, "Case %d: %d\n", cnt, use)
 	}
