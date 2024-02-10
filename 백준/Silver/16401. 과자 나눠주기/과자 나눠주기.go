@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func main() {
@@ -22,8 +21,6 @@ func main() {
 		fmt.Fscan(r, &arr[i])
 	}
 
-	sort.Ints(arr)
-
 	var start, end int = 0, 1e9
 	for start < end {
 		mid := (start + end + 1) / 2
@@ -40,6 +37,9 @@ func ok(arr []int, m, n int) bool {
 	cnt := 0
 	for _, num := range arr {
 		cnt += num / n
+		if cnt >= m {
+			return true
+		}
 	}
-	return cnt >= m
+	return false
 }
