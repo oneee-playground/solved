@@ -26,22 +26,9 @@ func main() {
 	newArr := make([]int, n)
 	copy(newArr, arr)
 	sort.Ints(newArr)
-	compressed := compress(newArr)
-
+	newArr = slices.Compact(newArr)
 	for _, num := range arr {
-		idx, _ := slices.BinarySearch(compressed, num)
+		idx, _ := slices.BinarySearch(newArr, num)
 		fmt.Fprintf(w, "%d ", idx)
 	}
-}
-
-func compress(arr []int) []int {
-	newArr := make([]int, 0)
-	last := 0
-	for _, num := range arr {
-		if num != last {
-			newArr = append(newArr, num)
-			last = num
-		}
-	}
-	return newArr
 }
