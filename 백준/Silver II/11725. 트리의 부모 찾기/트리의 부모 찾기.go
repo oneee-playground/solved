@@ -27,13 +27,11 @@ func main() {
 	}
 
 	p := make([]int, n+1)
-	visit := make([]bool, n+1)
 
 	var dfs func(idx int)
 	dfs = func(idx int) {
-		visit[idx] = true
 		for _, node := range nodes[idx] {
-			if visit[node] {
+			if p[node] != 0 {
 				continue
 			}
 			p[node] = idx
