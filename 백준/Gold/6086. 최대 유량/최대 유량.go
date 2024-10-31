@@ -12,8 +12,7 @@ var (
 	capacity, flow [][]int
 	parent         []int
 
-	// charRange = int('z'-'a') * 2
-	charRange = 200
+	charRange = int('z'-'a'+1) * 2
 )
 
 func maxFlow(src, dst int) (result int) {
